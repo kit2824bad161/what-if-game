@@ -1,0 +1,72 @@
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+*/node_modules/
+client/node_modules/
+server/node_modules/
+
+# ==========================================
+# Environment Variables & Secrets (CRITICAL)
+# ==========================================
+.env
+.env.*
+*.env
+*.local
+server/.env
+server/.env.*
+client/.env
+client/.env.*
+*.key
+*.pem
+*.cert
+
+# Allow example templates
+!.env.example
+!server/.env.example
+!client/.env.example
+
+# ==========================================
+# Production Builds
+# ==========================================
+dist/
+dist-ssr/
+build/
+client/dist/
+*.tsbuildinfo
+
+# ==========================================
+# Logs & System Files
+# ==========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.system_generated/
+*.tmp
+*.temp
+
+# ==========================================
+# Operating System
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# Editor & IDE Directories
+# ==========================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.agents/
+.gemini/

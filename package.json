@@ -1,0 +1,15 @@
+{
+  "name": "what-if-movie-game",
+  "version": "1.0.0",
+  "description": "WHAT IF - The Alternate Movie Universe. Full-Stack AI + RAG + Multiplayer Web Application.",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "seed": "npm --prefix server run seed",
+    "test": "npm --prefix server test",
+    "build:client": "npm --prefix client run build"
+  },
+  "keywords": ["movie", "ai", "rag", "groq", "multiplayer", "what-if"],
+  "author": "",
+  "license": "MIT"
+}

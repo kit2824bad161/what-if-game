@@ -1,0 +1,24 @@
+{
+  "name": "what-if-movie-game-server",
+  "version": "1.0.0",
+  "description": "Backend for WHAT IF - The Alternate Movie Universe",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test src/tests/*.test.js",
+    "seed": "node src/scripts/seed.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "fuse.js": "^7.1.0",
+    "groq-sdk": "^0.15.0",
+    "mongoose": "^8.9.5",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.0.5",
+    "zod": "^3.24.1"
+  }
+}
