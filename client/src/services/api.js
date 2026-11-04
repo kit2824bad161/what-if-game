@@ -1,29 +1,47 @@
 /**
- * Resolves the API base URL:
- * 1. If VITE_API_URL is set (e.g. in client/.env), use it.
- * 2. If accessed from a secondary device via LAN IP/hostname, connect directly to port 5000: http://<LAN-IP>:5000/api
- * 3. Default to '/api' for localhost development (served via Vite proxy).
+ * WHAT IF — The Alternate Movie Universe
+ * Centralized API Service Configuration
+ * 
+ * Resolves API Base URL:
+ * 1. If VITE_API_URL is configured (e.g. in Vercel or client/.env), normalizes it to guarantee
+ *    a clean base ending in '/api' without double '/api/api' prefixes.
+ * 2. If running on a local private LAN IP (e.g. 192.168.x.x or 10.x.x.x), connects to port 5000: http://<LAN-IP>:5000/api
+ * 3. Default to '/api' for localhost development (served via Vite proxy) or same-origin deployments.
  */
 export const getApiBaseUrl = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL.replace(/\/$/, '');
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim().length > 0) {
+    const trimmed = envUrl.trim().replace(/\/+$/, '');
+    return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
   }
+
   if (typeof window !== 'undefined' && window.location) {
     const hostname = window.location.hostname;
     const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-    if (hostname && hostname !== 'localhost' && hostname !== '127.0.0.1') {
+
+    // Support local LAN device testing (e.g. testing from mobile or another laptop on same Wi-Fi)
+    const isLanIp = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(hostname);
+    if (isLanIp) {
       return `${protocol}//${hostname}:5000/api`;
     }
+
+    // In production without explicit VITE_API_URL, default to same-domain '/api'
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      return '/api';
+    }
   }
+
   return '/api';
 };
 
 /**
- * Universal API fetch wrapper with centralized error handling
+ * Universal API fetch wrapper with centralized error handling and safe JSON parsing
  */
 async function apiRequest(endpoint, options = {}) {
   const apiBase = getApiBaseUrl();
-  const url = `${apiBase}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${apiBase}${cleanEndpoint}`;
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -38,10 +56,20 @@ async function apiRequest(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, config);
-    const data = await response.json();
+
+    // Safely parse JSON or handle plain text / HTML error responses gracefully
+    const contentType = response.headers.get('content-type') || '';
+    let data;
+    if (contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      data = { message: text || `HTTP ${response.status} ${response.statusText}` };
+    }
 
     if (!response.ok) {
-      throw new Error(data.message || `Request failed with status ${response.status}`);
+      const errorMsg = data.message || data.error || `Request failed with status ${response.status}`;
+      throw new Error(errorMsg);
     }
 
     return data;

@@ -20,12 +20,17 @@ export const config = {
   mongodbUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/whatif_movies',
   groq: {
     apiKey: (process.env.GROQ_API_KEY || '').trim(),
-    model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-    fallbackModels: ['qwen/qwen3.8-27b', 'openai/gpt-oss-20b'],
+    model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    fallbackModels: [
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
+      'llama-3.1-70b-versatile',
+      'mixtral-8x7b-32768',
+    ],
     hasKey: Boolean(process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.trim().length > 0),
   },
   tmdb: {
-    apiKey: process.env.TMDB_API_KEY || '',
+    apiKey: (process.env.TMDB_API_KEY || '').trim(),
     hasKey: Boolean(process.env.TMDB_API_KEY && process.env.TMDB_API_KEY.trim().length > 0),
   },
   embeddings: {
@@ -55,5 +60,5 @@ export const getIntegrationStatus = () => ({
   database: {
     uriConfigured: Boolean(config.mongodbUri),
     type: config.mongodbUri.includes('mongodb+srv') ? 'mongodb_atlas' : 'local_mongodb',
-  }
+  },
 });

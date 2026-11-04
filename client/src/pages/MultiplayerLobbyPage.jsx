@@ -54,6 +54,11 @@ export const MultiplayerLobbyPage = () => {
       setLoading(false);
     });
 
+    s.on('connect_error', (err) => {
+      setError('Real-time multiplayer server is currently unreachable. If deployed on Vercel Serverless, persistent WebSockets require a persistent backend host (such as Render or Railway).');
+      setLoading(false);
+    });
+
     // If roomCode is in URL, auto-sync with existing room
     const roomCodeParam = searchParams.get('roomCode');
     if (roomCodeParam) {
@@ -69,6 +74,7 @@ export const MultiplayerLobbyPage = () => {
       s.off('room:updated', handleRoomUpdate);
       s.off('room:game_started', handleRoomUpdate);
       s.off('error');
+      s.off('connect_error');
     };
   }, [navigate, searchParams, guest.guestId, guest.name]);
 

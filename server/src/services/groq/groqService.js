@@ -15,8 +15,8 @@ export class GroqService {
     this.client = this.hasKey
       ? new Groq({ apiKey: this.apiKey, timeout: 35000 })
       : null;
-    this.model = config.groq.model || 'openai/gpt-oss-120b';
-    this.fallbackModels = config.groq.fallbackModels || ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b'];
+    this.model = config.groq.model || 'llama-3.3-70b-versatile';
+    this.fallbackModels = config.groq.fallbackModels || ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'llama-3.1-70b-versatile', 'mixtral-8x7b-32768'];
   }
 
   isLive() {
@@ -53,9 +53,10 @@ export class GroqService {
     const candidateModels = Array.from(new Set([
       this.model,
       ...(this.fallbackModels || []),
-      'openai/gpt-oss-120b',
-      'qwen/qwen3.8-27b',
-      'openai/gpt-oss-20b'
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
+      'llama-3.1-70b-versatile',
+      'mixtral-8x7b-32768',
     ])).filter(Boolean);
 
     let lastError = null;

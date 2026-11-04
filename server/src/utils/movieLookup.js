@@ -1,6 +1,8 @@
+import mongoose from 'mongoose';
 import { Movie } from '../models/Movie.js';
 import { MovieChunk } from '../models/MovieChunk.js';
 import { isCorrectGuess } from './fuzzyMatch.js';
+import { connectDB } from '../config/db.js';
 
 /**
  * Normalizes movie titles for comparison
@@ -19,6 +21,22 @@ function cleanTitle(str) {
  * Returns { success: true, movie } or { success: false, message, supportedMovies }
  */
 export async function findMovieByTitleOrId(input) {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await connectDB();
+    } catch {
+      // Handled below
+    }
+  }
+
+  if (mongoose.connection.readyState !== 1) {
+    return {
+      success: false,
+      message: 'Database connection unavailable.',
+      supportedMovies: [],
+    };
+  }
+
   if (!input || typeof input !== 'string') {
     const supported = await getSupportedMovieTitles();
     return {
@@ -100,6 +118,14 @@ async function verifyMovieChunks(movie) {
 }
 
 export async function getSupportedMovieTitles() {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await connectDB();
+    } catch {
+      return [];
+    }
+  }
+  if (mongoose.connection.readyState !== 1) return [];
   const movies = await Movie.find({}, 'title').lean();
   return movies.map(m => m.title);
 }

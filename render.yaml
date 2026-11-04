@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: what-if-game-backend
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: CLIENT_URL
+        sync: false
+      - key: ADMIN_SECRET_KEY
+        sync: false
+      - key: EMBEDDING_PROVIDER
+        value: local
+
