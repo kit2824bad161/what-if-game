@@ -1,5 +1,6 @@
 import os from 'os';
 import http from 'http';
+import mongoose from 'mongoose';
 import { Server } from 'socket.io';
 import app from './app.js';
 import { config } from './config/env.js';
@@ -55,3 +56,36 @@ startServer().catch(err => {
   console.error('[Server] Fatal startup error:', err);
   process.exit(1);
 });
+
+// Graceful shutdown handling for container and persistent cloud hosts
+async function gracefulShutdown(signal) {
+  console.log(`\n[Server] Received ${signal}. Starting graceful shutdown...`);
+  try {
+    io.close(() => {
+      console.log('[Server] Socket.IO server closed.');
+    });
+
+    server.close(async () => {
+      console.log('[Server] HTTP server closed.');
+      try {
+        await mongoose.disconnect();
+        console.log('[Database] MongoDB disconnected cleanly.');
+      } catch (err) {
+        console.error('[Database] Disconnect error:', err.message);
+      }
+      process.exit(0);
+    });
+
+    // Fallback force shutdown if connections hang beyond 10 seconds
+    setTimeout(() => {
+      console.error('[Server] Forceful shutdown initiated after timeout.');
+      process.exit(1);
+    }, 10000).unref();
+  } catch (err) {
+    console.error('[Server] Error during shutdown:', err);
+    process.exit(1);
+  }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
